@@ -1,5 +1,6 @@
 package com.example.quizapp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class QuizAppController {
     private List<Quiz> quizzes = new ArrayList<>();
+    private QuizFileDao quizFileDao = new QuizFileDao();
 
     @GetMapping("/show")
     public List<Quiz> show() {
@@ -25,7 +27,6 @@ public class QuizAppController {
 
     @GetMapping("/check")
     public String check(@RequestParam String question, @RequestParam boolean answer) {
-        // TODO: 回答が正しいかどうかチェックして、結果を返却する
         // 指定されたquestionを登録済みのクイズから検索する
         for (Quiz quiz: quizzes) {
             // もしクイズが見つかったら
@@ -42,5 +43,17 @@ public class QuizAppController {
 
         // クイズがみつからなかった場合は、「問題がありません」と返却する
         return "問題がありません！";
+    }
+
+    @PostMapping("/save")
+    public String save() {
+        try {
+            quizFileDao.write(quizzes);
+            return "ファイルに保存しました";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "ファイルの保存に失敗しました";
+        }
+
     }
 }
